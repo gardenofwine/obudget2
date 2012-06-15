@@ -30,24 +30,7 @@ $.extend
             
         # initialize the view with default contents,
         # before setData is called 
-        @container.html '
-        <table cellpadding="0" cellspacing="0" border="0" class="display">
-            <thead>
-                <tr>
-                    <th>תקציב</th>
-                    <th>שנה</th>
-                    <th>מזהה</th>
-                </tr>
-            </thead>
-            <tbody>
-                <tr class="odd gradeX">
-                    <td>1234.0</td>
-                    <td>1948</td>
-                    <td>0020</td>
-                </tr>
-            </tbody>
-        </table>
-        '
+        @container.html Mustache.to_html $.mustacheTemplates.defaultTableView, {}
 
         $('table', @container).dataTable(tableDef)
         return
