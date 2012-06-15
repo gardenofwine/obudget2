@@ -27,7 +27,9 @@ $.extend
 
             table.fnClearTable false
             table.fnAddData data.values
-
+            
+        # initialize the view with default contents,
+        # before setData is called 
         @container.html '
         <table cellpadding="0" cellspacing="0" border="0" class="display">
             <thead>
