@@ -20,10 +20,12 @@ $.extend
 			# set up the model listener
 			mlist = $.ModelListener
 				loadItem : (data)->
+
 					# set navigation title
 					mus_data =
 						title: data.title
 						vid: data.virtual_id
+					# titleToOnClick attaches a history pushState action when clicking on an item
 					$.extend data, {mus_url: $.titleToUrl mus_data}, {mus_onclick : $.titleToOnClick mus_data}
 					if data.ancestry?
 						data.mus_ancestry = data.ancestry.slice(0).reverse()
@@ -34,10 +36,12 @@ $.extend
 							$.extend value, {mus_url: $.titleToUrl mus_value}, {mus_onclick: $.titleToOnClick mus_value}
 							return
 
-
 					console.log "** loadItem - set navigation."
-					console.log data.ancestry
+					console.log "** Data Ancestry: ", data.ancestry 
+
+					# render the ancestors of the current slug => heading, top right, "<B<A"
 					($ "#navigator #ancestors").html Mustache.to_html $.mustacheTemplates.navigator_ancestors, data
+					# renders the leaf section heading, top right (the x in "X<B<A")
 					($ "#navigator #current_section").html Mustache.to_html $.mustacheTemplates.navigator_current_section, data
 
 					# Set the Disqus comments plugin for the current graph
@@ -55,9 +59,14 @@ $.extend
 					return
 
 			model.addListener mlist
+			
+			# get first data
 			model.getData History.getState().data.vid
 
-			# Set up the History state change
+			# Set up the History state change handler
+			# whenever the history state changes, 
+			# make the model inititiate a data load 
+			# which will also wakeup listeners
 			History.Adapter.bind window, 'statechange', ->
 				console.log "state changed!"
 				if not History.getState().data.vid?
@@ -67,12 +76,20 @@ $.extend
 				model.getData History.getState().data.vid
 				return
 
+			# loop over all viz controllers
+			# for each generate a button, which when clicked invokes
+			# the showcontroller function on the corresponding controller
+			
+			# then add all the button to to div given to us by the caller 
 			for cont in $.Visualization.controllers()
 				do (cont) ->
 					###
-					add button to select the visualization represented bythe controller
+					add button to select the visualization represented by the controller
 					###
 					#button = $("<input type='button' class='vis-button' value='Show " + cont.id + "' id='vis-" + cont.id + "-button'/>")
+
+					# these buttons use href="#" as per bootstrap guidelines.
+					# see http://twitter.github.com/bootstrap/javascript.html#dropdowns
 					button = $("<li><a href='#" + cont.id + "'>" + cont.id + "</a></li>")
 					button.click  ->
 						$.Visualization.showController cont
@@ -80,6 +97,8 @@ $.extend
 
 					$visButtons.append button
 					return
+					
+			# activate all dropdown menus , bootstrap idiom
 			$('.dropdown-toggle').dropdown()
 
 			###
@@ -95,12 +114,13 @@ $.extend
 #				$.Visualization.visibleCont().setMultiYear (val == "true")
 #				return
 
-
 			return
 
 		showController : (cont) =>
+			# hide previous visible controller if any
 			if (@_visCont? and @_visCont != cont)
 				@_visCont.setVisible(false);
+			# remember tha new active controller and make it visible
 			@_visCont = cont
 			cont.setVisible(true)
 
@@ -108,6 +128,8 @@ $.extend
 			($ "#embed-widget textarea").html '&lt;iframe width="560" height="315" src="VizEmbed.html?' + cont.id + '" &gt;&lt;/iframe&gt;'
 
 			return
+			
+		# not used?
 		controllerByType : (type) =>
 			controllers = $.Visualization.controllers()
 			cont = null

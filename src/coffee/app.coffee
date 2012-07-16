@@ -10,6 +10,7 @@ $.extend
 			return
 		main : ->
 			$.Visualization.initControllers $("#vis-buttons")
+			# start off by making one of the viz visible (i.e. SingleYear)
 			$.Visualization.showController $.Visualization.controllers()[0]
 
 			search = new $.Search ($ "#searchbox input"), ($ "#searchresults")

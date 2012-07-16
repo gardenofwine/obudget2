@@ -5,7 +5,7 @@ class $.SingleYearTableController extends $.Controller
 		@createView = (div)->
 				new $.TableView div,@onSubSection
 		@onSubSection = (subsection) ->
-			console.log History.getState()
+			console.log "SYTController.onSubSection: Current state is ", CurreHistory.getState()
 			state = History.getState()
 			History.pushState {vid:subsection[2], rand:Math.random()}, subsection[1], $.titleToUrl({title:subsection[1], vid:subsection[2]}) #CR: Please explain the rand thing...
 			return

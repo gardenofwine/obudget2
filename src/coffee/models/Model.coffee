@@ -59,23 +59,33 @@ class _Singleton_Model
 		return
 
 	getData : (slug) =>
+		console.log "getData() invoked with slug ",slug
 		if @loading
+			console.log("getData: Still loading")
 			return
 		else
+			# try to get the data from local Storage
 			data = JSON.parse localStorage.getItem "ob_" + slug #CR: Are you sure that this can't throw an exception?
 
+			# if successful, process the response
+			# and return
 			if data?
+				console.log("getData: got data from localStorage")
 				@loadResponse data
 				return
 
-			loadResponse = @loadResponse
-			loadLocally = @loadLocally
+			# if not , get the data via the web API 
+			# through the H object from hasadna-api.js
+			# to get the data, using the slug from
+			# as query
+			# (jerry-rigged to referenced local subdir /data actually)
+			
 			# Catch ajax errors when invoking
-			H.getRecord "/" + slug, (data)->
+			H.getRecord "/" + slug, (data)=>
 				if data?
-					loadResponse data
+					@loadResponse data
 				else
-					loadLocally "/" + slug, loadResponse
+					@loadLocally "/" + slug, @loadResponse
 				return
 
 			@loading = true
@@ -88,6 +98,8 @@ class _Singleton_Model
 		@listeners.push list
 		return
 
+# this is a template for a listener
+# which can then be fed to addListener
 $.extend
 	###
 	allow people to create listeners easily
